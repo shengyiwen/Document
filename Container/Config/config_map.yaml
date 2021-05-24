@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-config-map-volume
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["/bin/sh", "-c", "cat /etc/config/config.properties"]
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+
+  volumes:
+    - name: config-volume
+      configMap:
+        name: myconfig
+  restartPolicy: Never
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myconfig
+  namespace: default
+data:
+  special.level: info
+  special.type: hello
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-config-map-var
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["/bin/sh", "-c", "echo $(LEVEL) $(TYPE)"]
+      env:
+        - name: LEVEL
+          valueFrom:
+            configMapKeyRef:
+              key: special.level
+              name: myconfig
+        - name: TYPE
+          valueFrom:
+            configMapKeyRef:
+              key: special.type
+              name: myconfig
+  restartPolicy: Never

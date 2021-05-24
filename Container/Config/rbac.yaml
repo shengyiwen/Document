@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: role-demo
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: role-demo
+  name: pod-reader-rolebinding
+subjects:
+  - kind: User
+    name: lucy
+    apiGroup: rbac.authorization.k8s.iorbac.authorization.k8s.io/v1
+roleRef:
+  kind: Role # this must be 'Role' or 'ClusterRole'
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io

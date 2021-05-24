@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: store-nfs-nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          volumeMounts:
+            - mountPath: /user/share/nginx/html
+              name: wwwroot
+          ports:
+            - containerPort: 80
+      volumes:
+        - name: wwwroot
+          nfs:
+            path: 192.168.150.16
+            server: /data/nfs
