@@ -12,14 +12,14 @@
 
 共享锁又称为读锁，简称S锁，顾名思义就是多个事务对于同一数据可以共享一把锁，都能访问到最新的数据
 
-session1 | session2
----|---
-begin; | begin;
-select * from tb_user where id = 1 lock in share mode <br/> // 锁定记录成功 | -
-- |  select * from tb_user where id = 1 lock in share mode  <br/> // 也可以锁定成功
-update tb_user set username='asheng' where id = 1; <br/> select sleep(10); <br/> // 执行成功并且等待10s | -
-- | update tb_user set username='asheng1' where id = 1; <br/> // 有可能会直接抛出死锁，或者执行进入阻塞
-commit; | 此时update才会执行成功
+|session1 | session2|
+|---|---|
+|begin; | begin;|
+|select * from tb_user where id = 1 lock in share mode <br/> // 锁定记录成功 | -|
+|- |  select * from tb_user where id = 1 lock in share mode  <br/> // 也可以锁定成功|
+|update tb_user set username='asheng' where id = 1; <br/> select sleep(10); <br/> // 执行成功并且等待10s | -|
+|- | update tb_user set username='asheng1' where id = 1; <br/> // 有可能会直接抛出死锁，或者执行进入阻塞|
+|commit; | 此时update才会执行成功|
 
 - 结论
     - 多个事务的查询语句可以共用一把共享锁
@@ -31,13 +31,13 @@ commit; | 此时update才会执行成功
 
 排它锁又称为写锁，简称X锁，顾名思义排它锁不能和其他的锁共存，并且只有一个事务能拿到某一行数据的排它锁，其他事务均不能获取到该锁
 
-session1 | session2
----|---
-begin | begin
-select * from tb_user where id = 1 for update; <br/> // 执行成功 | -
-- | select * from tb_user where id = 1 for update; <br/> // 将会进入阻塞
-update tb_user set username='asheng' where id = 1; <br/> // 执行成功 | // 继续阻塞
-commit | 此时session2进入查询并且加锁成功
+|session1 | session2|
+|---|---|
+|begin | begin|
+|select * from tb_user where id = 1 for update; <br/> // 执行成功 | - |
+| - | select * from tb_user where id = 1 for update; <br/> // 将会进入阻塞|
+|update tb_user set username='asheng' where id = 1; <br/> // 执行成功 | // 继续阻塞|
+|commit | 此时session2进入查询并且加锁成功|
 
 - 结论:
     - 只有一个事务能够获取该数据的排它锁
@@ -76,14 +76,14 @@ commit | 此时session2进入查询并且加锁成功
 
 - 因为表锁颗粒度大，所以竞争的概率高，因此并发度比较低
 
-session1 | session2
----|---
-lock table tb_user read; <br/> // 使用读锁进行锁表 | -
-select * from tb_user <br/> // 可以执行 | select * from tb_user <br/> // 可以执行
-select * from tb_teacher <br/> // 在不释放锁的情况，不能读取其他表  | select * from tb_teacher <br> // 可以执行
-update tb_user set username = 'a' <br/> // 不释放锁不能执行，将会执行报错 | -
-- | update tb_user set username = 'a' <br/> // 不释放锁将会一直阻塞
-unlock tables; <br/> // 释放锁 | 此时update阻塞结束
+|session1 | session2|
+|---|---|
+|lock table tb_user read; <br/> // 使用读锁进行锁表 | -|
+|select * from tb_user <br/> // 可以执行 | select * from tb_user <br/> // 可以执行|
+|select * from tb_teacher <br/> // 在不释放锁的情况，不能读取其他表  | select * from tb_teacher <br> // 可以执行|
+|update tb_user set username = 'a' <br/> // 不释放锁不能执行，将会执行报错 | -|
+|- | update tb_user set username = 'a' <br/> // 不释放锁将会一直阻塞|
+|unlock tables; <br/> // 释放锁 | 此时update阻塞结束|
 
 - 看看那些表被加锁了
     
@@ -143,13 +143,13 @@ unlock tables; <br/> // 释放锁 | 此时update阻塞结束
 - InnoDB也会对这个"间隙"加锁，这种锁机制就是所谓的间隙锁(Next-key锁)
 
 
-session1 | session2
----|---
-select * from tb_user; <br/> // 存在两条记录，分别为id为1和id为3的记录 | - 
-begin; | begin;
-select * from tb_user where id > 1 and id < 3 for update; <br/> // 此时会对1-3的数据产生间隙锁 | -
-- | INSERT INTO tb_user(`id`, `create_time`, `update_time`, `delete_time`, `username`, `password`, `salt`, `phone`, `role`) <br/> VALUES (2, '2021-01-29 09:09:43', '2021-01-29 09:09:46', NULL, 'b', 'aa', 'aa', '18326937760', 'admin'); <br/> // 此时插入1-3之内的间隙，就进入等待
-commit; <br/> // 提交事务 | 此时插入成功
+|session1 | session2|
+|---|---|
+|select * from tb_user; <br/> // 存在两条记录，分别为id为1和id为3的记录 | - |
+|begin; | begin;|
+|select * from tb_user where id > 1 and id < 3 for update; <br/> // 此时会对1-3的数据产生间隙锁 | -|
+|- | INSERT INTO tb_user(`id`, `create_time`, `update_time`, `delete_time`, `username`, `password`, `salt`, `phone`, `role`) <br/> VALUES (2, '2021-01-29 09:09:43', '2021-01-29 09:09:46', NULL, 'b', 'aa', 'aa', '18326937760', 'admin'); <br/> // 此时插入1-3之内的间隙，就进入等待|
+|commit; <br/> // 提交事务 | 此时插入成功|
 
 - 结论
 
