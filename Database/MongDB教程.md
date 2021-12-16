@@ -181,17 +181,16 @@ MongDB中的OR条件，使用$or关键字
 类似于 select by, count(*) from test group by 'by';
 
 
-表达式 | 描述 | MongoDB
----|---|---
-$sum | 求和 | db.test.aggregate([{$group: {_id: '$by', num:{$sum: 1}}}])
-$avg | 求平均值 | db.test.aggregate([{$group: {'_id','$by', avg: {$avg: '$likes'}}}])
-$min | 最小值 | db.test.aggregate([{$group: {'_id': '$by', min: {$min: '$likes'}}}])
-$max |最大值 | 替换min为max
-$push | 在结果文档中插入值到一个数组中 | db.test.aggregate([{$group: {_id: '$by', url_array: {$push: '$url'}}}]) **注释: 就是将同一组到数据到某个字段放到url_array中 **
-$addToSet | 在结果文档中插入值到一个数组中，但不创建副本 | db.test.aggregate([{$group: {$id: '$by', url_set: {$addToSet: "$url"}}}])
-$first | 根据资源文档但排序获取第一个文档数据 | db.test.aggregate([{$group: {$id: "$by", first_url: {$first: '$url'}}}])
-$last | 根据资源文档获取最后一个文档数据 | 同上，替换first为last
-
+| 表达式       | 描述                     | MongoDB                                                                                                     |
+|-----------|------------------------|-------------------------------------------------------------------------------------------------------------|
+| $sum      | 求和                     | db.test.aggregate([{$group: {_id: '$by', num:{$sum: 1}}}])                                                  |
+| $avg      | 求平均值                   | db.test.aggregate([{$group: {'_id','$by', avg: {$avg: '$likes'}}}])                                         |
+| $min      | 最小值                    | db.test.aggregate([{$group: {'_id': '$by', min: {$min: '$likes'}}}])                                        |
+| $max      | 最大值                    | 替换min为max                                                                                                   |
+| $push     | 在结果文档中插入值到一个数组中        | db.test.aggregate([{$group: {_id: '$by', url_array: {$push: '$url'}}}]) **注释: 就是将同一组到数据到某个字段放到url_array中 ** |
+| $addToSet | 在结果文档中插入值到一个数组中，但不创建副本 | db.test.aggregate([{$group: {$id: '$by', url_set: {$addToSet: "$url"}}}])                                   |
+| $first    | 根据资源文档但排序获取第一个文档数据     | db.test.aggregate([{$group: {$id: "$by", first_url: {$first: '$url'}}}])                                    |
+| $last     | 根据资源文档获取最后一个文档数据       | 同上，替换first为last                                                                                             |
 
 11. 管道的概念
 

@@ -35,11 +35,11 @@
 
 - 符合索引，即一个索引包含多个列
 
-操作 | 语句 | 备注
-:----:|:----:|----
-创建 | create [unique] index index_name on table(column(length)) | 如果是BLOB或者TEXT类型，必须指定长度
-删除 | drop index index_name on table | -
-查看 | show index from table | -
+| 操作  |                            语句                             | 备注                     |
+|:---:|:---------------------------------------------------------:|------------------------|
+| 创建  | create [unique] index index_name on table(column(length)) | 如果是BLOB或者TEXT类型，必须指定长度 |
+| 删除  |              drop index index_name on table               | -                      |
+| 查看  |                   show index from table                   | -                      |
 
 ---
 

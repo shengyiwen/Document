@@ -10,24 +10,22 @@ aop都有哪些注解
 
 正常流程
 
-| spring4 | spring5
-|---|---
-| @AroundBegin | @AroundBegin
-| @Before | @Before
-| @AroundEnd | @AfterReturning
-| @After |  @After
-| @AfterReturning | @AroundEnd
-
+| spring4         | spring5         |
+|-----------------|-----------------|
+| @AroundBegin    | @AroundBegin    |
+| @Before         | @Before         |
+| @AroundEnd      | @AfterReturning |
+| @After          | @After          |
+| @AfterReturning | @AroundEnd      |
 
 异常流程
 
-| spring4 | spring5
-|---|---
-| @AroundBegin | @AroundBegin
-| @Before | @Before
-| @After |  @AfterThrowing
-| @AfterThrowing | @After
-
+| spring4        | spring5        |
+|----------------|----------------|
+| @AroundBegin   | @AroundBegin   |
+| @Before        | @Before        |
+| @After         | @AfterThrowing |
+| @AfterThrowing | @After         |
 
 #### 2. Spring的三级缓存
 

@@ -91,10 +91,10 @@ D持久性是由内存和redo log保证的，mysql修改数据同时内存和red
 
 以下表为例:
 
-id | name | create_version | delete_version
----|---|---|---
-1 | "asheng" | 1 | 1
-2 | "tom" | 2 | 2
+| id  | name     | create_version | delete_version |
+|-----|----------|----------------|----------------|
+| 1   | "asheng" | 1              | 1              |
+| 2   | "tom"    | 2              | 2              |
 
 这个时候假设A去执行查询，此时current_version=3
 

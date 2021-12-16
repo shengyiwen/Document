@@ -62,4 +62,113 @@ hash(192.168.3.8#2) --> node2
 
 ### 4.代码实现
 
-具体的实现请参考evision-core/evision-utils/com/evision/common下的ConsistentHashLoadBalance
+```java
+package com.evision.common.loadbalance;
+
+/**
+ * 负载均衡器
+ *
+ * @author asheng
+ * @since 2020/9/10
+ */
+public interface LoadBalance {
+
+    /**
+     * 根据key选择服务器
+     *
+     * @param key 服务器选择key
+     * @return 服务器地址
+     */
+    String choose(String key);
+
+}
+```
+
+```java
+package com.evision.common.loadbalance;
+
+import com.evision.common.Assert;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+/**
+ * 一致性hash算法[带有虚拟节点]
+ *
+ * @author asheng
+ * @since 2020/9/1
+ */
+public class ConsistentHashLoadBalance implements LoadBalance {
+
+    /** 已经归类的节点map */
+    protected final SortedMap<Integer, String> nodeMap = new TreeMap<>();
+
+    /** 实际节点 */
+    private final List<String> realNodes = new LinkedList<>();
+
+    /** 虚拟节点数 */
+    private final int virtualNodeCount;
+
+    public ConsistentHashLoadBalance(List<String> nodes, int virtualNodeCount) {
+        Assert.assertNotEmpty(nodes, "server nodes can not be empty");
+        this.virtualNodeCount = virtualNodeCount;
+        for (String node : nodes) {
+            realNodes.add(node);
+            for (int i = 0; i < virtualNodeCount; i ++) {
+                String virtualNode = node + "##" + i;
+                int hash = getHash(virtualNode);
+                nodeMap.put(hash, virtualNode);
+            }
+        }
+    }
+
+    @Override
+    public String choose(String key) {
+        int hash = getHash(key);
+        // 获取比此key大的所有节点
+        SortedMap<Integer, String> subMap = nodeMap.tailMap(hash);
+
+        String serverVirtualNode;
+        if (subMap.isEmpty()) {
+            // 如果节点为空，则表示此环回归到了终点，选取第一个
+            Integer idx = nodeMap.firstKey();
+            serverVirtualNode = nodeMap.get(idx);
+        } else {
+            // 获取里此key最近的一个节点
+            Integer idx = subMap.firstKey();
+            serverVirtualNode = subMap.get(idx);
+        }
+        return serverVirtualNode.substring(0, serverVirtualNode.indexOf("##"));
+    }
+
+    /**
+     * 使用FNV1_32 Hash算法
+     *
+     * @param key 需要做hash的key
+     * @return hash结果
+     */
+    protected int getHash(String key) {
+        final int p = 16777619;
+        int hash = (int) 2166136261L;
+        for (int i = 0; i < key.length(); i++) {
+            hash = (hash ^ key.charAt(i)) * p;
+        }
+        hash += hash << 13;
+        hash ^= hash >> 7;
+        hash += hash << 3;
+        hash ^= hash >> 17;
+        hash += hash << 5;
+        return hash < 0 ? Math.abs(hash) : hash;
+    }
+
+    public int getVirtualNodeCount() {
+        return virtualNodeCount;
+    }
+
+    public List<String> getRealNodes() {
+        return realNodes;
+    }
+}
+```

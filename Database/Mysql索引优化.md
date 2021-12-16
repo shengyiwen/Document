@@ -108,27 +108,27 @@
 
 - mysqldumpslow的帮助信息
 
-|参数|备注|
-|----|----|
-s | 按照何种方式排序
-c | 访问次数
-l | 锁定时间
-r | 返回记录
-t | 查询时间
-al | 平均锁定时间
-ar | 平均返回记录数
-at | 平均查询时间
-t | 即为返回前面多少条的数据
-g | 后面搭配一个正则匹配模式，大小写不敏感
+| 参数  | 备注                  |
+|-----|---------------------|
+| s   | 按照何种方式排序            |
+| c   | 访问次数                |
+| l   | 锁定时间                |
+| r   | 返回记录                |
+| t   | 查询时间                |
+| al  | 平均锁定时间              |
+| ar  | 平均返回记录数             |
+| at  | 平均查询时间              |
+| t   | 即为返回前面多少条的数据        |
+| g   | 后面搭配一个正则匹配模式，大小写不敏感 |
 
 - 用法
 
-|语句|备注|
-|----|----|
-mysqldumpslow -s r -t 10 slow_sql.log | 得到返回记录集最多的10个sql
-mysqldumpslow -s c -t 10 slow_sql.log | 得到访问次数最多的10个sql
-mysqldumpslow -s t -t 10 - g "left join" slow_sql.log | 得到按照时间排序的前10条里面包含左连接的查询语句
-mysqldumpslow -s r -t 10 slow_sql.log & more | 使用上面命令输出，并使用more查看，避免出现刷屏的情况
+| 语句                                                    | 备注                           |
+|-------------------------------------------------------|------------------------------|
+| mysqldumpslow -s r -t 10 slow_sql.log                 | 得到返回记录集最多的10个sql             |
+| mysqldumpslow -s c -t 10 slow_sql.log                 | 得到访问次数最多的10个sql              |
+| mysqldumpslow -s t -t 10 - g "left join" slow_sql.log | 得到按照时间排序的前10条里面包含左连接的查询语句    |
+| mysqldumpslow -s r -t 10 slow_sql.log & more          | 使用上面命令输出，并使用more查看，避免出现刷屏的情况 |
 
 ---
 
@@ -158,17 +158,17 @@ mysqldumpslow -s r -t 10 slow_sql.log & more | 使用上面命令输出，并使
 
 - type
 
-|参数|备注|
-|----|----|
-ALL | 显示所有的开销信息
-BLOCK IO | 显示块IO相关开销
-CONTEXT SWITCHES | 上下文切换相关开销
-CPU | 显示CPU相关开销
-IPC | 显示发送和接收相关开销
-MEMORY | 显示内存先关开销
-PAGE FAULTS | 显示页面错误相关开销
-SOURCE | 显示和SOURCE_FUNCTION、SOURCE_FILE、SOURCE_LINE相关的开销
-SWAPS | 显示交换次数相关开销
+| 参数               | 备注                                              |
+|------------------|-------------------------------------------------|
+| ALL              | 显示所有的开销信息                                       |
+| BLOCK IO         | 显示块IO相关开销                                       |
+| CONTEXT SWITCHES | 上下文切换相关开销                                       |
+| CPU              | 显示CPU相关开销                                       |
+| IPC              | 显示发送和接收相关开销                                     |
+| MEMORY           | 显示内存先关开销                                        |
+| PAGE FAULTS      | 显示页面错误相关开销                                      |
+| SOURCE           | 显示和SOURCE_FUNCTION、SOURCE_FILE、SOURCE_LINE相关的开销 |
+| SWAPS            | 显示交换次数相关开销                                      |
 
 - 重点关注的结果
 
