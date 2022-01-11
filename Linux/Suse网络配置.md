@@ -54,6 +54,12 @@ sudo vim /etc/resolv.conf
 nameserver=114.114.114.114
 ```
 
+### 方法三
+
+```shell
+sudo yast lan
+```
+
 ### 重启网络
 
 ```shell
