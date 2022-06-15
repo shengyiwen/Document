@@ -110,6 +110,8 @@ public class RedissonDistributeLock implements DistributeLock {
 
 ![加锁流程](../Images/redisson_lock_process.png)
 
+- 释放流程
+
 ![解锁流程.png](../Images/redisson_unlock_processor.png)
 
 ### 源码分析

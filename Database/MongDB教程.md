@@ -89,14 +89,14 @@ findOne()只返回一个文档
 
 
 
-操作 | 格式 | MongDB | RDBMS
----|---|---|---
-等于 | {key: value} | db.test.find({'by': 'asheng'}) | where by='asheng'
-小于 | {key: {$ls: value}} | db.test.find({'likes': {$lt:50}}) | where likes < 50
-小于或等于 | {key: {$lte: val}} | db.test.find({'likes': {$lte: 50}}} | where likes <= 50
-大于 | {key: {$gt: val}} | db.test.find({'likes': {$gt: 50}}) | where likes > 50
-大于或等于 | {key: {$gte: val}} | db.test.find({'likes': {$gte: 50}}) |  where likes >= 50
-不等于 | {key: {$ne: val}} | db.test.find({'likes': {$ne: 50}}) | where likes != 50
+| 操作    | 格式                  | MongDB                              | RDBMS             |
+|-------|---------------------|-------------------------------------|-------------------|
+| 等于    | {key: value}        | db.test.find({'by': 'asheng'})      | where by='asheng' |
+| 小于    | {key: {$ls: value}} | db.test.find({'likes': {$lt:50}})   | where likes < 50  |
+| 小于或等于 | {key: {$lte: val}}  | db.test.find({'likes': {$lte: 50}}} | where likes <= 50 |
+| 大于    | {key: {$gt: val}}   | db.test.find({'likes': {$gt: 50}})  | where likes > 50  |
+| 大于或等于 | {key: {$gte: val}}  | db.test.find({'likes': {$gte: 50}}) | where likes >= 50 |
+| 不等于   | {key: {$ne: val}}   | db.test.find({'likes': {$ne: 50}})  | where likes != 50 |
 
 MongDB的find可以传入多个key，每个key已,隔开，即SQL的AND操作
 
