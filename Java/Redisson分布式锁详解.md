@@ -337,7 +337,6 @@ public class RedissonLock extends RedissonExpirable implements RLock {
                 "end; " +
                 "return nil;",
             Arrays.<Object>asList(getName(), getChannelName()), LockPubSub.UNLOCK_MESSAGE, internalLockLeaseTime, getLockName(threadId));
-
     }
     
 }
