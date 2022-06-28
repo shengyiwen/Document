@@ -45,9 +45,9 @@
 
 ### 索引的结构
 
-- BTree索引
+- B+Tree索引
 
-实际情况中，3层的B+数可以表示上百万的数据，上百万的数据只需要三次IO
+实际情况中，3层的B+树可以表示上百万的数据，上百万的数据只需要三次IO
 
 ![mysql_btree_index.png](../Images/mysql_btree_index.png)
 
