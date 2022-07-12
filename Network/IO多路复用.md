@@ -328,6 +328,11 @@ epoll好一些
 综上述，如果想看更加详细的代码实现的话，可以参考redis源码里的select/epoll/kqueue等
 
 
+### 参考文档
+
+https://www.zhihu.com/question/32163005/answer/2379675650
+
+
 
 
 

@@ -47,9 +47,9 @@ ThreadLocal可以实现每个线程都有自己专属的本地变量。ThreadLoc
 
     public class Thread {
      
-    ThreadLocal.ThreadLocalMap threadLocals = null;
+        ThreadLocal.ThreadLocalMap threadLocals = null;
 
-    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+        ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
     }
 
 最后查看ThreadLocal原码，这里我们能看到，获取值的时候，会先获取当前线程，然后根据当前线程获取线程里的ThreadMap对象，获取到ThreadMap对象后，在根据ThreadLocal本身对象this指针作为key去获取value，如果获取到的ThreadLocalMap为空，则去创建一个ThreadLocalMap复制给当前Thread，其子类也对其做了实现
@@ -100,9 +100,9 @@ ThreadLocal可以实现每个线程都有自己专属的本地变量。ThreadLoc
         }
         
         public void remove() {
-         ThreadLocalMap m = getMap(Thread.currentThread());
-         if (m != null)
-             m.remove(this);
+            ThreadLocalMap m = getMap(Thread.currentThread());
+            if (m != null)
+                m.remove(this);
         }
         
     }
