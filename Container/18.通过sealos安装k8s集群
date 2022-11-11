@@ -1,0 +1,135 @@
+### Sealos安装k8s
+
+#### 1. 准备服务器环境
+
+```shell
+# 为每台机器设置hostname
+hostnamectl set-hostname xxx
+```
+
+#### 2. 第一台Master安装sealos
+
+```shell
+sudo cat > /etc/yum.repos.d/labring.repo << EOF
+[fury]
+name=labring Yum Repo
+baseurl=https://yum.fury.io/labring/
+enabled=1
+gpgcheck=0
+EOF
+sudo yum clean all
+sudo yum install sealos
+```
+
+#### 3. 通过sealos安装k8s集群
+
+```shell
+# 通过sealos安装k8s集群，设置号需要安装的组件以及节点，注意版本号的选择
+sealos run labring/kubernetes:v1.24.0 labring/helm:v3.8.2 labring/flannel:v0.18.1 \
+     --masters 172.29.67.13,172.29.67.35,172.29.67.32 \
+     --nodes 172.29.67.30
+```
+
+#### 4. 安装k8s-dashboard
+
+```shell
+# 下载dashboard.yaml，并安装dash-board
+curl https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.1/aio/deploy/recommended.yaml -o dashboard.yaml
+
+kubectl apply -f dashboard.yaml
+```
+
+```shell
+# 生成证书文件，CN修改为自己的IP
+openssl genrsa -out dashboard.key 2048
+openssl req -days 3650 -new -out dashboard.csr -key dashboard.key -subj '/CN=172.29.67.13'
+openssl x509 -req -in dashboard.csr -signkey dashboard.key -out dashboard.crt
+
+# 替换之前的证书
+kubectl delete secret kubernetes-dashboard-certs  --namespace kubernetes-dashboard 
+kubectl create secret generic kubernetes-dashboard-certs --from-file=dashboard.key --from-file=dashboard.crt -n kubernetes-dashboard
+
+# 然后需要删除kubernetes-dashboard的pod，让服务重新启动
+```
+
+```shell
+# 通过Kubectl创建user，然后获取token，详细参考github，因k8s 1.24版本以后对token进行了一些修改，因此需要根据如下配置
+curl https://github.com/shengyiwen/Document/blob/master/Container/Config/dashboard-user.yaml -o > dashboard-user.yaml
+
+kubectl apply -f dashboard-user.yaml
+# 获取dashboard-user的token
+kubectl describe -nkube-system secret/secret-admin
+```
+
+#### 5. 安装promethus
+
+```shell
+# 通过sealos安装promethus和granfa，granfa默认账户名密码为admin/prom-operator
+sealos run labring/kube-prometheus-stack:v0.56.0
+# 修改promethus为NodePort类型，并设置为端口为30090和30091
+```
+
+#### 6. 安装Rancher
+
+```shell
+# 下载签名脚本
+curl https://github.com/shengyiwen/Document/blob/master/Container/Config/create_signed_cert.sh -o create_signed_cert.sh
+
+# 颁发签名，域名需要修改
+./create_signed_cert.sh --ssl-domain=devbp.rancher.com --ssl-size=2048 --ssl-date=3650
+```
+
+```shell
+# 创建命名空间
+kubectl create ns cattle-system
+# 创建密钥
+kubectl -n cattle-system create secret tls tls-rancher-ingress --cert=./tls.crt --key=./tls.key
+# 创建密钥
+kubectl -n cattle-system create secret generic tls-ca --from-file=./cacerts.pem
+```
+
+```shell
+# 通过helm创建rancher
+helm install rancher rancher-latest/rancher \
+  --namespace cattle-system \
+  --set systemDefaultRegistry=registry.cn-hangzhou.aliyuncs.com \
+  --set hostname=devbp.rancher.com \
+  --set ingress.tls.source=secret \
+  --set privateCA=true \
+  --set bootstrapPassword=admin
+```
+
+```shell
+# 服务安装完成后，需要配置服务器的hosts文件，将host与clusterIP地址进行映射
+192.168.1.0 devbp.rancher.com
+```
+
+```nginx
+# 将生成的证书放到相应路径下
+
+server {
+    listen       443 ssl;
+    #server_name  devbp.rancher.com;
+
+    ssl_certificate "/etc/nginx/ssl/devbp.rancher.com.crt";
+    ssl_certificate_key "/etc/nginx/ssl/devbp.rancher.com.key";
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  10m;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Load configuration files for the default server blodck.
+    include /etc/nginx/default.d/*.conf;
+
+    location ^~ / {
+        proxy_pass https://devbp.rancher.com/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+}
+      
+# 由于没有使用域名证书，所以客户需要修改host文件，增加此配置172.29.67.13 devbp.rancher.com        
+#打开https://devbp.rancher.com, 初次访问，设置密码: devbp.rancher
+```
+
